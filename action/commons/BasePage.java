@@ -220,6 +220,9 @@ public class BasePage {
 //               getElement(driver, locator).sendKeys(keysToSend);
 //           }
         // cách viết trên chưa hợp lý, thay vì phải viết hàm if thì clear luôn sau đó sendKey
+        // Trong hàm sendKey có 1 hàm clear mà trên Firefox:
+        // nếu 1 element là thẻ input mà bị ẩn - invisable mà thực hiện clear sẽ bị lỗi
+        // Vì để sendkey được thì element phải visiable thì mới sendkey được
         getElement(driver, locator).clear();
         getElement(driver, locator).sendKeys(keysToSend);
 
@@ -269,7 +272,7 @@ public class BasePage {
          sleepInSeconds(2);
 
         List<WebElement> allItems = new WebDriverWait(driver, Duration.ofSeconds(GlobalConstants.LONG_TIMEOUT))
-                .until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath(childItemLocator)));
+                .until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByLocator(childItemLocator)));
 
         sleepInSeconds(2);
         for (WebElement item : allItems) {
@@ -311,7 +314,11 @@ public class BasePage {
     }
     //4. getElementsSize(findElements)
     public List<WebElement> getListElements(WebDriver driver, String locator) {
-        return driver.findElements(By.xpath(locator));
+        return driver.findElements(getByLocator(locator));
+    }
+
+    public List<WebElement> getListElements(WebDriver driver, String locator, String... restParameter) {
+        return driver.findElements(getByLocator(castParameter(locator, restParameter)));
     }
 
     public int getElementsSize(WebDriver driver, String locator) {
@@ -323,12 +330,23 @@ public class BasePage {
         if (!getElement(driver, locator).isSelected()){
             getElement(driver, locator).click();
         }
+    }
 
+    public void checkTheCheckbox(WebDriver driver, String locator, String... restParameter) {
+        if (!getElement(driver, castParameter(locator, restParameter)).isSelected()){
+            getElement(driver, castParameter(locator, restParameter)).click();
+        }
     }
     //6. UncheckTheCheckbox
-    public void UncheckTheCheckbox(WebDriver driver, String locator){
+    public void uncheckTheCheckbox(WebDriver driver, String locator){
         if (getElement(driver, locator).isSelected()){
             getElement(driver, locator).click();
+        }
+    }
+
+    public void uncheckTheCheckbox(WebDriver driver, String locator, String... restParameter) {
+        if (getElement(driver, castParameter(locator, restParameter)).isSelected()){
+            getElement(driver, castParameter(locator, restParameter)).click();
         }
     }
     //7. isElementDisplay
@@ -544,6 +562,35 @@ public class BasePage {
     public void waitForElementClickable(WebDriver driver, String locator, String... resParameter){
         new WebDriverWait(driver, Duration.ofSeconds(GlobalConstants.LONG_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(getByLocator(castParameter(locator, resParameter))));
+    }
+
+    // Upload File or Multiple Files
+    public void uploadMultipleFiles (WebDriver driver, String... fileNames){
+        // Lấy ra đường dẫn củathư mục Upload File
+        String filePath = GlobalConstants.UPLOAD_PATH;
+
+        // Vì đây là biêến local nên bắt buộc phải khởi tạo dữ liệu trước khi chạy để ko báo lỗi
+        String fullFileName = "";
+
+        // Dùng vòng lặp duyêt qua các file name
+        for (String file : fileNames){
+            fullFileName = fullFileName + filePath + file + "\n";
+        }
+
+        // Cắt ký tự xuống dòng (\n) ở 2 đầu chuỗi
+        fullFileName = fullFileName.trim();
+
+        // Sendkey vào
+        // Vì sao ko dùng hàm SendkeyToElement() mà lại dùng hàm getElement(). Vì:
+        // Trong hàm sendKey mình đang có 2 hàm:
+        // + hàm clear, để clear được thì element phải visable.
+        // hàm sendKey: không quan tâm đến việc element visable hay ko
+        // Nhưng thẻ input trong các đường dẫn - upload thường bị ẩn - invisiable
+        // >> nên khi chạy auto trên Fire fox sẽ gây ra lỗi Could not be Scroll into view - không clear được vì element bị ẩn
+        // Để tránh lỗi trên thì mình dùng hàm getElement() sau đó thực hiện sendKey vì
+        // hàm getElement mới chỉ tìm ra element thôi chứ ko clear
+        getElement(driver, BasePageUIs.UPLOAD_FILE_TYPE).sendKeys(fullFileName);
+
     }
 
     // Các hàm open các Page only use Level_07
