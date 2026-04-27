@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Nopcommerce Automaition Testing">
+    <listeners>
+        <listener class-name="commons.MethodListener"/>
+    </listeners>
+
     <parameter name="userUrl" value="http://user.local:8086/"/>
     <parameter name="adminUrl" value="http://admin.local:8086/admin"/>
+
     <test name="Run on Chrome browser">
         <parameter name="browser" value="chrome"/>
         <classes>
-<!--            <class name="com.nopcommerce.users.Level_04_Multiple_Browser"/>-->
-            <class name="com.nopcommerce.users.Level_10_1_Dynamic_Locator"/>
+            <class name="com.nopcommerce.common.Login"/>
+            <class name="com.nopcommerce.users.Level_20_Share_State"/>
         </classes>
     </test>
 
 <!--    <test name="Run on Firefox browser">-->
 <!--        <parameter name="browser" value="firefox"/>-->
 <!--        <classes>-->
+<!--            <class name="com.nopcommerce.users.Level_14_Log4J"/>-->
 <!--&lt;!&ndash;            <class name="com.nopcommerce.users.Level_04_Multiple_Browser"/>&ndash;&gt;-->
 <!--&lt;!&ndash;            <class name="com.nopcommerce.users.Level_05_PageFactory"/>&ndash;&gt;-->
 <!--        </classes>-->

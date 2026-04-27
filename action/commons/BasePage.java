@@ -1,6 +1,7 @@
 package commons;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,7 +13,10 @@ import pageObjects.nopcommerce.user.UserCustomerInforPO;
 import pageObjects.nopcommerce.user.UserOrderPO;
 import pageObjects.nopcommerce.user.UserRewardPointPO;
 import pageUIs.nopcommerce.BasePageUIs;
+import pageUIs.orangehrm.OrangeHRMBasePageUIs;
+import pageUIs.orangehrm.pim.employee.PersonalDetailsPageUIs;
 
+import java.awt.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
@@ -223,7 +227,16 @@ public class BasePage {
         // Trong hàm sendKey có 1 hàm clear mà trên Firefox:
         // nếu 1 element là thẻ input mà bị ẩn - invisable mà thực hiện clear sẽ bị lỗi
         // Vì để sendkey được thì element phải visiable thì mới sendkey được
-        getElement(driver, locator).clear();
+        // getElement(driver, locator).clear(); // với một số site thì hàm clear không clear data được
+        // Trong TH khi sendkey nhưng site không tự clear giá trị cũ đi (trong hàm có dùng clear()) thì dùng phím tắt để clear
+        // Nếu dùng cho máy Widown thì thay COMMAND = CONTROL
+        Keys key = null;
+        if (GlobalConstants.OS_NAME.startsWith("windows")) {
+            key = Keys.CONTROL;
+        }else {
+            key = Keys.COMMAND;
+        }
+        getElement(driver, locator).sendKeys(Keys.chord(key, "a", Keys.BACK_SPACE));
         getElement(driver, locator).sendKeys(keysToSend);
 
     }
@@ -269,15 +282,14 @@ public class BasePage {
     public void selectItemInCustomDropdown(WebDriver driver, String parentLocator, String childItemLocator, String expectedItem) {
 
          getElement(driver, parentLocator).click();
-         sleepInSeconds(2);
+         sleepInSeconds(1);
 
         List<WebElement> allItems = new WebDriverWait(driver, Duration.ofSeconds(GlobalConstants.LONG_TIMEOUT))
                 .until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByLocator(childItemLocator)));
 
-        sleepInSeconds(2);
+        sleepInSeconds(1);
         for (WebElement item : allItems) {
             if (item.getText().trim().equals(expectedItem)) {
-
                 item.click();
                 break;
             }
@@ -296,8 +308,16 @@ public class BasePage {
         return getElement(driver, locator).getDomAttribute(attributeName);
     }
 
+    public String getDOMPropertiesAttributeValue(WebDriver driver,String locator, String attributeName) {
+        return getElement(driver, locator).getDomProperty(attributeName);
+    }
+
     public String getAttributeValue(WebDriver driver,String locator, String attributeName, String... restParameter) {
         return getElement(driver, castParameter(locator, restParameter)).getDomAttribute(attributeName);
+    }
+
+    public Dimension getElementSize(WebDriver driver,String locator) {
+        return getElement(driver, locator).getSize();
     }
 
     //2. getCssValue
@@ -321,18 +341,18 @@ public class BasePage {
         return driver.findElements(getByLocator(castParameter(locator, restParameter)));
     }
 
-    public int getElementsSize(WebDriver driver, String locator) {
+    public int getElementsCount(WebDriver driver, String locator) {
         return getListElements(driver, locator).size();
     }
 
     //5. checkTheCheckbox
-    public void checkTheCheckbox(WebDriver driver, String locator) {
+    public void checkToCheckboxRadio(WebDriver driver, String locator) {
         if (!getElement(driver, locator).isSelected()){
             getElement(driver, locator).click();
         }
     }
 
-    public void checkTheCheckbox(WebDriver driver, String locator, String... restParameter) {
+    public void checkToCheckboxRadio(WebDriver driver, String locator, String... restParameter) {
         if (!getElement(driver, castParameter(locator, restParameter)).isSelected()){
             getElement(driver, castParameter(locator, restParameter)).click();
         }
@@ -525,6 +545,15 @@ public class BasePage {
                 .until(ExpectedConditions.invisibilityOfElementLocated(getByLocator(castParameter(locator, resParameter))));
     }
 
+    // 5. waitForListElement
+    public void waitForListElementInvisible(WebDriver driver, String locator){
+        new WebDriverWait(driver, Duration.ofSeconds(GlobalConstants.LONG_TIMEOUT))
+                .until(ExpectedConditions.invisibilityOfElementLocated(getByLocator(locator))
+
+                        //invisibilityOfAllElements(getListElements(driver, locator))
+                );
+    }
+
     //6. waitForElementPresence
     public void waitForElementPresence(WebDriver driver, String locator){
         new WebDriverWait(driver, Duration.ofSeconds(GlobalConstants.LONG_TIMEOUT))
@@ -583,8 +612,8 @@ public class BasePage {
         // Sendkey vào
         // Vì sao ko dùng hàm SendkeyToElement() mà lại dùng hàm getElement(). Vì:
         // Trong hàm sendKey mình đang có 2 hàm:
-        // + hàm clear, để clear được thì element phải visable.
-        // hàm sendKey: không quan tâm đến việc element visable hay ko
+        // + hàm clear, để clear được thì element phải visiable.
+        // hàm sendKey: không quan tâm đến việc element visiable hay ko
         // Nhưng thẻ input trong các đường dẫn - upload thường bị ẩn - invisiable
         // >> nên khi chạy auto trên Fire fox sẽ gây ra lỗi Could not be Scroll into view - không clear được vì element bị ẩn
         // Để tránh lỗi trên thì mình dùng hàm getElement() sau đó thực hiện sendKey vì
@@ -593,7 +622,7 @@ public class BasePage {
 
     }
 
-    // Các hàm open các Page only use Level_07
+    // Các hàm open các Page only use Level_07 and Nopcommerce`
     public UserRewardPointPO openRewardPointPage(WebDriver driver) {
         waitForElementClickable(driver, BasePageUIs.REWARD_POINT_LINK);
         clickToElement(driver, BasePageUIs.REWARD_POINT_LINK);
@@ -618,5 +647,61 @@ public class BasePage {
 
     public void openAdminSite(WebDriver driver, String adminUrl) {
             openPageURL(driver, adminUrl);
+    }
+
+    public void enterToTextboxByID(WebDriver driver, String textboxID, String value) {
+            waitForElementVisible(driver, BasePageUIs.TEXTBOX_BY_ID, textboxID);
+            sendKeysToElement(driver, BasePageUIs.TEXTBOX_BY_ID, value, textboxID);
+    }
+
+    public void clickToButtonByText(WebDriver driver, String buttonText) {
+            waitForElementClickable(driver, BasePageUIs.BUTTON_BY_TEXT, buttonText);
+            clickToElement(driver, BasePageUIs.BUTTON_BY_TEXT, buttonText);
+
+    }
+
+    public void clickToRadioByID(WebDriver driver, String radioID) {
+            waitForElementClickable(driver, BasePageUIs.RADIO_BY_ID, radioID);
+        checkToCheckboxRadio(driver, BasePageUIs.RADIO_BY_ID, radioID);
+    }
+
+    public void clickToCheckboxByID(WebDriver driver, String checkboxID) {
+            waitForElementClickable(driver, BasePageUIs.CHECKBOX_BY_ID, checkboxID);
+           checkToCheckboxRadio(driver, BasePageUIs.CHECKBOX_BY_ID, checkboxID);
+    }
+
+    public String getTextboxByID(WebDriver driver, String textboxID) {
+            waitForElementVisible(driver, BasePageUIs.TEXTBOX_BY_ID, textboxID);
+            return getAttributeValue(driver, BasePageUIs.TEXTBOX_BY_ID, "value", textboxID);
+    }
+
+    public boolean isRadioSelected(WebDriver driver, String radioID) {
+            waitForElementSelected(driver, BasePageUIs.RADIO_BY_ID, radioID);
+            return isElementSelected(driver, BasePageUIs.RADIO_BY_ID, radioID);
+    }
+    public boolean isCheckboxSelected(WebDriver driver, String checkboxID) {
+        waitForElementSelected(driver, BasePageUIs.CHECKBOX_BY_ID, checkboxID);
+        return isElementSelected(driver, BasePageUIs.CHECKBOX_BY_ID, checkboxID);
+    }
+
+    public Set<Cookie> getAllCookies(WebDriver driver) {
+            return driver.manage().getCookies();
+    }
+
+    public void setCookies (WebDriver driver, Set<Cookie> cookies) {
+        for (Cookie cookie : cookies){
+            driver.manage().addCookie(cookie);
+        }
+        sleepInSeconds(3);
+    }
+
+    // Only user orangeHRM project
+    public void waitAllLoadingIconInvisible(WebDriver driver) {
+        waitForElementInvisible(driver, OrangeHRMBasePageUIs.LOADING_ICON);
+
+    }
+    public boolean isSuccesMessageIsDisplayed(WebDriver driver) {
+        waitForElementVisible(driver, OrangeHRMBasePageUIs.SUCCES_MASSAGE_UPLOAD);
+        return isElementDisplay(driver, OrangeHRMBasePageUIs.SUCCES_MASSAGE_UPLOAD);
     }
 }

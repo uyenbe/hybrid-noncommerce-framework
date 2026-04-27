@@ -98,7 +98,7 @@ public class HomePO extends BasePage {
 
         // Kiểm tra giá trị của checkbox
         if (checkOrUncheck) {
-            checkTheCheckbox(driver, HomePageUI.DYNAMIC_CHECKBOX_BY_ROW_AND_COLUMN_INDEX, rowIndex, columnIndex);
+            checkToCheckboxRadio(driver, HomePageUI.DYNAMIC_CHECKBOX_BY_ROW_AND_COLUMN_INDEX, rowIndex, columnIndex);
         }else {
             uncheckTheCheckbox(driver, HomePageUI.DYNAMIC_CHECKBOX_BY_ROW_AND_COLUMN_INDEX, rowIndex, columnIndex);
         }

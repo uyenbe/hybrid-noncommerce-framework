@@ -121,7 +121,7 @@ public class Level_11_DataTable extends BaseTest {
         homePage.sleepInSeconds(2);
         // Có thể thao tác với bất kỳ 1 colum hay 1 row nào
         // Truyền vào tên cột >> tự xử lý để lấy ra column Index sau đó thực hiện sendKey
-//        homePage.enterToTextboxByIndex("1","Contact Person","UyenNT");
+      homePage.enterToTextboxByIndex("1","Contact Person","UyenNT");
 //        homePage.sleepInSeconds(2);
 //
 //        homePage.enterToTextboxByIndex("2","Company","Công ty TNHH A");

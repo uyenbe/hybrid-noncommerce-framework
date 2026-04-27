@@ -19,6 +19,8 @@ public class UserRegisterPageUI {
 
     public static final String LOGOUT_LINK = "xpath=//a[@class='ico-logout']";
 
+    public static final String REGISTER_TITLE = "css= div.page-title > h1";
+
 
 
 }

@@ -14,7 +14,7 @@ public class UserRegisterPO extends BasePage {
 
     public void clickGenderRadioButton() {
         waitForElementClickable(driver, UserRegisterPageUI.GENDER_MALE_RADIO);
-        checkTheCheckbox(driver, UserRegisterPageUI.GENDER_MALE_RADIO);
+        checkToCheckboxRadio(driver, UserRegisterPageUI.GENDER_MALE_RADIO);
     }
 
     public void enterFirstNameTextbox(String firstName) {
@@ -60,5 +60,10 @@ public class UserRegisterPO extends BasePage {
 
 
 
+    }
+
+    public String getRegisterTitle() {
+        waitForElementVisible(driver, UserRegisterPageUI.REGISTER_TITLE);
+        return getElementText(driver, UserRegisterPageUI.REGISTER_TITLE);
     }
 }

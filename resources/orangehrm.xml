@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Nopcommerce Automaition Testing">
-    <parameter name="url" value="https://www.jqueryscript.net/demo/CRUD-Data-Grid-Plugin-jQuery-Quickgrid/"/>
+<suite name="Orange HRM 5">
+<!--    <listeners>-->
+<!--        <listener class-name="commons.MethodListener"/>-->
+<!--    </listeners>-->
+
+    <parameter name="url" value="http://localhost/orangehrm-5.7/web/index.php/auth/login"/>
+
     <test name="Run on Chrome browser">
         <parameter name="browser" value="chrome"/>
         <classes>
-<!--            <class name="com.nopcommerce.users.Level_04_Multiple_Browser"/>-->
-            <class name="com.jQuery.Level_11_DataTable"/>
+<!--            <class name="com.nopcommerce.common.Login"/>-->
+            <class name="com.orangehrm.pim.PIM_Employee_01"/>
         </classes>
     </test>
 
 <!--    <test name="Run on Firefox browser">-->
 <!--        <parameter name="browser" value="firefox"/>-->
 <!--        <classes>-->
+<!--            <class name="com.nopcommerce.users.Level_14_Log4J"/>-->
 <!--&lt;!&ndash;            <class name="com.nopcommerce.users.Level_04_Multiple_Browser"/>&ndash;&gt;-->
 <!--&lt;!&ndash;            <class name="com.nopcommerce.users.Level_05_PageFactory"/>&ndash;&gt;-->
 <!--        </classes>-->
